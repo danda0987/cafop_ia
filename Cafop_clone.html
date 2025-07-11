@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consultation des résultats du CAFOP-IA</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+            border: 2px solid #e0e0e0;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .logo-circle {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-weight: bold;
+            color: white;
+            font-size: 18px;
+        }
+
+        .logo-text {
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .logo-subtitle {
+            font-size: 12px;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 30px;
+            font-weight: normal;
+            line-height: 1.4;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #d63384;
+        }
+
+        .search-button {
+            width: 100%;
+            padding: 15px;
+            background-color: #d63384;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .search-button:hover {
+            background-color: #b02a5b;
+        }
+
+        .back-link {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .result-section {
+            margin-top: 30px;
+            display: none;
+        }
+
+        .result-title {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .congratulations {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+        }
+
+        .congratulations .emoji {
+            font-size: 20px;
+            margin-right: 10px;
+        }
+
+        .result-details {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .result-item {
+            display: flex;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .result-label {
+            width: 150px;
+            color: #666;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+
+        .result-value {
+            color: #333;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        .blue-link {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .blue-link:hover {
+            text-decoration: underline;
+        }
+
+        .date-composition {
+            color: #d63384 !important;
+            font-weight: bold;
+        }
+
+        .print-button {
+            width: 100%;
+            padding: 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .print-button:hover {
+            background-color: #218838;
+        }
+
+        .not-found {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .loading {
+            display: none;
+            margin-top: 20px;
+            color: #666;
+        }
+
+        /* Styles pour l'administration cachée */
+        .admin-trigger {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            background-color: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            opacity: 0.3;
+            transition: opacity 0.3s;
+        }
+
+        .admin-trigger:hover {
+            opacity: 0.7;
+        }
+
+        .admin-login {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .admin-login-box {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 300px;
+            text-align: center;
+        }
+
+        .admin-login-box h3 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .admin-login-box input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .admin-login-box button {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .admin-login-box button:hover {
+            background-color: #0056b3;
+        }
+
+        .admin-login-box .cancel-btn {
+            background-color: #6c757d;
+        }
+
+        .admin-login-box .cancel-btn:hover {
+            background-color: #545b62;
+        }
+
+        .admin-panel {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1001;
+        }
+
+        .admin-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .admin-title {
+            font-size: 24px;
+            color: #333;
+            margin: 0;
+        }
+
+        .admin-close {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .admin-close:hover {
+            background-color: #c82333;
+        }
+
+        .admin-form {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .admin-form h4 {
+            margin-bottom: 15px;
+            color: #495057;
+        }
+
+        .admin-form-row {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .admin-form-row input {
+            flex: 1;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .admin-add-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .admin-add-btn:hover {
+            background-color: #218838;
+        }
+
+        .admin-list {
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .admin-list-header {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .admin-item {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .admin-item:last-child {
+            border-bottom: none;
+        }
+
+        .admin-item:hover {
+            background-color: #f8f9fa;
+        }
+
+        .admin-item-info {
+            flex: 1;
+            text-align: left;
+        }
+
+        .admin-item-name {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .admin-item-details {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .admin-delete-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .admin-delete-btn:hover {
+            background-color: #c82333;
+        }
+
+        .admin-stats {
+            background-color: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .admin-stats h4 {
+            color: #1976d2;
+            margin-bottom: 10px;
+        }
+
+        .admin-stats p {
+            color: #424242;
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">
+            <div class="logo-circle">D</div>
+            <div>
+                <div class="logo-text">DECO</div>
+                <div class="logo-subtitle">Direction des Examens et Concours</div>
+            </div>
+        </div>
+
+        <h1 class="title">
+            Consultation des résultats du<br>
+            CAFOP-IA (Premier tour)
+        </h1>
+
+        <form id="searchForm">
+            <div class="form-group">
+                <label for="searchInput">Numéro de table ou code d'inscription (CIA) :</label>
+                <input type="text" id="searchInput" placeholder="Ex: 25IA-623291" value="">
+            </div>
+
+            <button type="submit" class="search-button">Rechercher</button>
+        </form>
+
+        <a href="#" class="back-link">[ Retour au site web ]</a>
+
+        <div class="loading" id="loading">
+            <p>Recherche en cours...</p>
+        </div>
+
+        <div class="result-section" id="resultSection">
+            <h2 class="result-title">Résultat</h2>
+            
+            <div class="congratulations" id="congratulations">
+                <span class="emoji">(^_^)</span>
+                <span>Félicitations, vous êtes admis à subir les épreuves du test psychotechnique du CAFOP-IA Session 2025 !!</span>
+            </div>
+
+            <div class="not-found" id="notFound" style="display: none;">
+                <span>Aucun résultat trouvé pour ce numéro. Veuillez vérifier et réessayer.</span>
+            </div>
+
+            <div class="result-details" id="resultDetails">
+                <div class="result-item">
+                    <span class="result-label">Numéro de</span>
+                    <span class="result-value">
+                        <a href="#" class="blue-link">table</a>
+                        <span style="margin-left: 10px;">: <span id="tableNumber"></span></span>
+                    </span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Code d'inscription</span>
+                    <span class="result-value">: <span id="codeInscription"></span></span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Nom</span>
+                    <span class="result-value">: <span id="nom"></span></span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Prénom</span>
+                    <span class="result-value">: <span id="prenom"></span></span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Date de naissance</span>
+                    <span class="result-value">: <span id="dateNaissance"></span></span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Date de composition</span>
+                    <span class="result-value date-composition">: <span id="dateComposition"></span></span>
+                </div>
+            </div>
+
+            <button class="print-button" onclick="printConvocation()">
+                Imprimer la convocation au test psycho (PDF)
+            </button>
+        </div>
+    </div>
+
+    <!-- Bouton d'accès admin caché -->
+    <button class="admin-trigger" onclick="showAdminLogin()" title="Administration">⚙️</button>
+
+    <!-- Popup de connexion admin -->
+    <div class="admin-login" id="adminLogin">
+        <div class="admin-login-box">
+            <h3>🔐 Accès Administration</h3>
+            <input type="password" id="adminPassword" placeholder="Mot de passe" />
+            <button onclick="checkAdminPassword()">Se connecter</button>
+            <button class="cancel-btn" onclick="hideAdminLogin()">Annuler</button>
+        </div>
+    </div>
+
+    <!-- Panel d'administration -->
+    <div class="admin-panel" id="adminPanel">
+        <div class="admin-content">
+            <div class="admin-header">
+                <h2 class="admin-title">🛠️ Administration CAFOP-IA</h2>
+                <button class="admin-close" onclick="hideAdminPanel()">Fermer</button>
+            </div>
+
+            <div class="admin-stats">
+                <h4>📊 Statistiques</h4>
+                <p>Nombre total de candidats : <span id="totalStudents">0</span></p>
+                <p>Dernière mise à jour : <span id="lastUpdate">-</span></p>
+            </div>
+
+            <div class="admin-form">
+                <h4>➕ Ajouter un nouveau candidat</h4>
+                <div class="admin-form-row">
+                    <input type="text" id="adminTable" placeholder="Numéro de table (ex: 25IA-623291)" />
+                    <input type="text" id="adminCode" placeholder="Code d'inscription (ex: CIA25032108)" />
+                </div>
+                <div class="admin-form-row">
+                    <input type="text" id="adminNom" placeholder="Nom (ex: N'CHONON)" />
+                    <input type="text" id="adminPrenom" placeholder="Prénom (ex: ASSI JONAS)" />
+                </div>
+                <div class="admin-form-row">
+                    <input type="text" id="adminDateNaiss" placeholder="Date de naissance (ex: 13/08/1997)" />
+                    <input type="text" id="adminDateComp" placeholder="Date de composition (ex: Dimanche 29 juin 2025 - 07H30)" />
+                </div>
+                <button class="admin-add-btn" onclick="addStudent()">Ajouter le candidat</button>
+            </div>
+
+            <div class="admin-list">
+                <div class="admin-list-header">
+                    📋 Liste des candidats
+                </div>
+                <div id="adminList">
+                    <!-- Liste des étudiants sera affichée ici -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const ADMIN_PASSWORD = "admin2025"; // Changez ce mot de passe !
+        
+        // Base de données simulée (stockée en mémoire)
+        let studentsDatabase = [
+            {
+                tableNumber: "25IA-623291",
+                codeInscription: "CIA25032108",
+                nom: "N'CHONON",
+                prenom: "ASSI JONAS",
+                dateNaissance: "13/08/1997",
+                dateComposition: "Dimanche 29 juin 2025 - 07H30"
+            },
+            {
+                tableNumber: "25IA-623292",
+                codeInscription: "CIA25032109",
+                nom: "KOUAME",
+                prenom: "MARIE LOUISE",
+                dateNaissance: "15/03/1998",
+                dateComposition: "Dimanche 29 juin 2025 - 07H30"
+            },
+            {
+                tableNumber: "25IA-623293",
+                codeInscription: "CIA25032110",
+                nom: "TRAORE",
+                prenom: "IBRAHIM",
+                dateNaissance: "22/12/1996",
+                dateComposition: "Dimanche 29 juin 2025 - 07H30"
+            }
+        ];
+
+        // Fonction pour chercher un étudiant
+        function searchStudent(searchValue) {
+            return studentsDatabase.find(student => 
+                student.tableNumber.toLowerCase() === searchValue.toLowerCase() ||
+                student.codeInscription.toLowerCase() === searchValue.toLowerCase()
+            );
+        }
+
+        // Fonction pour afficher le résultat
+        function displayResult(student) {
+            document.getElementById('tableNumber').textContent = student.tableNumber;
+            document.getElementById('codeInscription').textContent = student.codeInscription;
+            document.getElementById('nom').textContent = student.nom;
+            document.getElementById('prenom').textContent = student.prenom;
+            document.getElementById('dateNaissance').textContent = student.dateNaissance;
+            document.getElementById('dateComposition').textContent = student.dateComposition;
+            
+            document.getElementById('congratulations').style.display = 'block';
+            document.getElementById('notFound').style.display = 'none';
+            document.getElementById('resultDetails').style.display = 'block';
+        }
+
+        // Fonction pour afficher "non trouvé"
+        function displayNotFound() {
+            document.getElementById('congratulations').style.display = 'none';
+            document.getElementById('notFound').style.display = 'block';
+            document.getElementById('resultDetails').style.display = 'none';
+        }
+
+        // Gestionnaire du formulaire de recherche
+        document.getElementById('searchForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const searchValue = document.getElementById('searchInput').value.trim();
+            const loadingDiv = document.getElementById('loading');
+            const resultSection = document.getElementById('resultSection');
+            
+            if (searchValue) {
+                // Afficher le chargement
+                loadingDiv.style.display = 'block';
+                resultSection.style.display = 'none';
+                
+                // Simuler un délai de recherche
+                setTimeout(() => {
+                    const student = searchStudent(searchValue);
+                    
+                    loadingDiv.style.display = 'none';
+                    resultSection.style.display = 'block';
+                    
+                    if (student) {
+                        displayResult(student);
+                    } else {
+                        displayNotFound();
+                    }
+                }, 1000);
+            } else {
+                alert('Veuillez entrer un numéro de table ou code d\'inscription.');
+            }
+        });
+
+        // Fonction pour imprimer la convocation
+        function printConvocation() {
+            const studentData = {
+                tableNumber: document.getElementById('tableNumber').textContent,
+                codeInscription: document.getElementById('codeInscription').textContent,
+                nom: document.getElementById('nom').textContent,
+                prenom: document.getElementById('prenom').textContent,
+                dateNaissance: document.getElementById('dateNaissance').textContent,
+                dateComposition: document.getElementById('dateComposition').textContent
+            };
+
+            // Créer le contenu PDF (simulation)
+            const printContent = `
+                <h2>CONVOCATION AU TEST PSYCHOTECHNIQUE</h2>
+                <h3>CAFOP-IA Session 2025</h3>
+                <br>
+                <p><strong>Numéro de table:</strong> ${studentData.tableNumber}</p>
+                <p><strong>Code d'inscription:</strong> ${studentData.codeInscription}</p>
+                <p><strong>Nom:</strong> ${studentData.nom}</p>
+                <p><strong>Prénom:</strong> ${studentData.prenom}</p>
+                <p><strong>Date de naissance:</strong> ${studentData.dateNaissance}</p>
+                <p><strong>Date de composition:</strong> ${studentData.dateComposition}</p>
+                <br>
+                <p>Vous êtes convoqué(e) pour passer le test psychotechnique.</p>
+                <p>Veuillez vous présenter à l'heure indiquée avec une pièce d'identité.</p>
+            `;
+
+            // Ouvrir une nouvelle fenêtre pour l'impression
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                    <head>
+                        <title>Convocation CAFOP-IA</title>
+                        <style>
+                            body { font-family: Arial, sans-serif; padding: 20px; }
+                            h2, h3 { text-align: center; }
+                            p { margin: 10px 0; }
+                        </style>
+                    </head>
+                    <body>
+                        ${printContent}
+                    </body>
+                </html>
+            `);
+            printWindow.document.close();
+            printWindow.print();
+        }
+
+        // Fonctions d'administration
+        function showAdminLogin() {
+            document.getElementById('adminLogin').style.display = 'flex';
+            document.getElementById('adminPassword').focus();
+        }
+
+        function hideAdminLogin() {
+            document.getElementById('adminLogin').style.display = 'none';
+            document.getElementById('adminPassword').value = '';
+        }
+
+        function checkAdminPassword() {
+            const password = document.getElementById('adminPassword').value;
+            if (password === ADMIN_PASSWORD) {
+                hideAdminLogin();
+                showAdminPanel();
+            } else {
+                alert('Mot de passe incorrect !');
+                document.getElementById('adminPassword').value = '';
+            }
+        }
+
+        function showAdminPanel() {
+            document.getElementById('adminPanel').style.display = 'flex';
+            updateAdminStats();
+            updateAdminList();
+        }
+
+        function hideAdminPanel() {
+            document.getElementById('adminPanel').style.display = 'none';
+        }
+
+        function updateAdminStats() {
+            document.getElementById('totalStudents').textContent = studentsDatabase.length;
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleString('fr-FR');
+        }
+
+        function addStudent() {
+            const tableNumber = document.getElementById('adminTable').value.trim();
+            const codeInscription = document.getElementById('adminCode').value.trim();
+            const nom = document.getElementById('adminNom').value.trim();
+            const prenom = document.getElementById('adminPrenom').value.trim();
+            const dateNaissance = document.getElementById('adminDateNaiss').value.trim();
+            const dateComposition = document.getElementById('adminDateComp').value.trim();
+
+            if (tableNumber && codeInscription && nom && prenom && dateNaissance && dateComposition) {
+                // Vérifier si le candidat existe déjà
+                const existingStudent = studentsDatabase.find(student => 
+                    student.tableNumber === tableNumber || student.codeInscription === codeInscription
+                );
+
+                if (existingStudent) {
+                    alert('Un candidat avec ce numéro de table ou code d\'inscription existe déjà !');
+                    return;
+                }
+
+                const newStudent = {
+                    tableNumber,
+                    codeInscription,
+                    nom,
+                    prenom,
+                    dateNaissance,
+                    dateComposition
+                };
+
+                studentsDatabase.push(newStudent);
+                
+                // Vider les champs
+                document.getElementById('adminTable').value = '';
+                document.getElementById('adminCode').value = '';
+                document.getElementById('adminNom').value = '';
+                document.getElementById('adminPrenom').value = '';
+                document.getElementById('adminDateNaiss').value = '';
+                document.getElementById('adminDateComp').value = '';
+                
+                updateAdminStats();
+                updateAdminList();
+                alert('✅ Candidat ajouté avec succès !');
+            } else {
+                alert('⚠️ Veuillez remplir tous les champs.');
+            }
+        }
+
+        function deleteStudent(index) {
+            const student = studentsDatabase[index];
+            if (confirm(`Êtes-vous sûr de vouloir supprimer le candidat :\n${student.nom} ${student.prenom} (${student.tableNumber}) ?`)) {
+                studentsDatabase.splice(index, 1);
+                updateAdminStats();
+                updateAdminList();
+                alert('🗑️ Candidat supprimé !');
+            }
+        }
+
+        function updateAdminList() {
+            const adminList = document.getElementById('adminList');
+            adminList.innerHTML = '';
+
+            if (studentsDatabase.length === 0) {
+                adminList.innerHTML = '<div class="admin-item">Aucun candidat enregistré</div>';
+                return;
+            }
+
+            studentsDatabase.forEach((student, index) => {
+                const div = document.createElement('div');
+                div.className = 'admin-item';
+                div.innerHTML = `
+                    <div class="admin-item-info">
+                        <div class="admin-item-name">${student.nom} ${student.prenom}</div>
+                        <div class="admin-item-details">
+                            Table: ${student.tableNumber} | Code: ${student.codeInscription} | Né(e) le: ${student.dateNaissance}
+                        </div>
+                    </div>
+                    <button class="admin-delete-btn" onclick="deleteStudent(${index})">🗑️ Supprimer</button>
+                `;
+                adminList.appendChild(div);
+            });
+        }
+
+        // Gestion des touches
+        document.addEventListener('keydown', function(e) {
+            // Fermer les popups avec Escape
+            if (e.key === 'Escape') {
+                hideAdminLogin();
+                hideAdminPanel();
+            }
+            
+            // Connexion admin avec Entrée
+            if (e.key === 'Enter' && document.getElementById('adminLogin').style.display === 'flex') {
+                checkAdminPassword();
+            }
+        });
+
+        // Gestion du lien retour
+        document.querySelector('.back-link').addEventListener('click', function(e) {
+            e.preventDefault();
+            window.history.back();
+        });
+
+        // Initialisation
+        updateAdminStats();
+    </script>
+</body>
+</html>
