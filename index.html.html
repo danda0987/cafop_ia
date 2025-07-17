@@ -1,0 +1,186 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Consultation des résultats définitifs du CAFOP-IA session 2025</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    .container {
+      background-color: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      width: 100%;
+      max-width: 500px;
+      text-align: center;
+    }
+    .search-button {
+      width: 100%;
+      padding: 15px;
+      background-color: #d63384;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin-bottom: 20px;
+    }
+    .search-button:hover {
+      background-color: #b02a5b;
+    }
+    .result-section {
+      margin-top: 30px;
+      display: none;
+    }
+    .result-title {
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 20px;
+      font-weight: bold;
+    }
+    .congratulations {
+      background-color: #d4edda;
+      color: #155724;
+      padding: 15px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+      border: 1px solid #c3e6cb;
+    }
+    .result-details {
+      text-align: left;
+      margin-bottom: 20px;
+    }
+    .result-item {
+      display: flex;
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .result-label {
+      width: 150px;
+      color: #666;
+      font-size: 14px;
+      flex-shrink: 0;
+    }
+    .result-value {
+      color: #333;
+      font-weight: bold;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1 class="title">
+      Consultation des résultats définitifs du<br />
+      CAFOP-IA session 2025
+    </h1>
+
+    <form id="searchForm">
+      <div class="form-group">
+        <label for="searchInput">Numéro de table ou code d'inscription (CIA) :</label>
+        <input type="text" id="searchInput" placeholder="Ex: 25IA-623291" value="" />
+      </div>
+      <button type="submit" class="search-button">Rechercher</button>
+    </form>
+
+    <div class="result-section" id="resultSection">
+      <h2 class="result-title">Résultat</h2>
+
+      <div class="congratulations" id="congratulations">
+        <span class="emoji">(^_^)</span>
+        <span>Félicitations, Vous êtes admis au CAFOP-IA session 2025 !!</span>
+      </div>
+
+      <div class="result-details" id="resultDetails">
+        <div class="result-item">
+          <span class="result-label">Numéro de table</span>
+          <span class="result-value" id="tableNumber"></span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">Code d'inscription</span>
+          <span class="result-value" id="codeInscription"></span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">Nom</span>
+          <span class="result-value" id="nom"></span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">Prénom</span>
+          <span class="result-value" id="prenom"></span>
+        </div>
+        <div class="result-item">
+          <span class="result-label">Date de naissance</span>
+          <span class="result-value" id="dateNaissance"></span>
+        </div>
+      </div>
+
+      <button class="search-button" onclick="location.reload()">🔍 Nouvelle Consultation</button>
+    </div>
+  </div>
+
+  <script>
+    const studentsDatabase = [
+      {
+        tableNumber: "25IA-623291",
+        codeInscription: "CIA25032108",
+        nom: "N'CHONON",
+        prenom: "ASSI JONAS",
+        dateNaissance: "13/08/1997"
+      },
+      {
+        tableNumber: "25IA-623292",
+        codeInscription: "CIA25032109",
+        nom: "KOUAME",
+        prenom: "MARIE LOUISE",
+        dateNaissance: "15/03/1998"
+      }
+    ];
+
+    function searchStudent(searchValue) {
+      return studentsDatabase.find(
+        student =>
+          student.tableNumber.toLowerCase() === searchValue.toLowerCase() ||
+          student.codeInscription.toLowerCase() === searchValue.toLowerCase()
+      );
+    }
+
+    function displayResult(student) {
+      document.getElementById("tableNumber").textContent = student.tableNumber;
+      document.getElementById("codeInscription").textContent = student.codeInscription;
+      document.getElementById("nom").textContent = student.nom;
+      document.getElementById("prenom").textContent = student.prenom;
+      document.getElementById("dateNaissance").textContent = student.dateNaissance;
+
+      document.getElementById("congratulations").style.display = "block";
+      document.getElementById("resultDetails").style.display = "block";
+    }
+
+    document.getElementById("searchForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const searchValue = document.getElementById("searchInput").value.trim();
+      const resultSection = document.getElementById("resultSection");
+
+      if (searchValue) {
+        const student = searchStudent(searchValue);
+        resultSection.style.display = "block";
+        if (student) {
+          displayResult(student);
+        } else {
+          resultSection.innerHTML = "<p style='color:red'>Aucun résultat trouvé.</p>";
+        }
+      }
+    });
+  </script>
+</body>
+</html>
